@@ -1,0 +1,11 @@
+engines:
+  eslint:
+    enabled: false
+ratings:
+   paths:
+   - server/**
+   - config/**
+   - "**.js"
+exclude_paths:
+- node_modules/**/*
+- server/tests/**
