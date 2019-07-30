@@ -6,6 +6,7 @@ const commentRoutes = require('./server/comment/route')
 const uploadRoutes = require('./server/upload/route')
 const replyRoutes = require('./server/reply/route')
 const likeRoutes = require('./server/like/route')
+const friendRoutes = require('./server/friend/route')
 
 const UploadMid = require('./server/helpers/UploadMid')
 const router = express.Router(); // eslint-disable-line new-cap
@@ -32,5 +33,7 @@ router.use('/replies', replyRoutes)
 router.use('/uploads', UploadMid, uploadRoutes)
 
 router.use('/likes', likeRoutes)
+
+router.use('/friends', friendRoutes)
 
 module.exports = router;

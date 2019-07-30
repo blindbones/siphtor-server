@@ -49,3 +49,4 @@ Logs stacktrace of error to console along with other details. You should ideally
 ![Error logging](https://cloud.githubusercontent.com/assets/4172932/12563361/fb9ef108-c3cf-11e5-9a58-3c5c4936ae3e.JPG)
 
 
+# siphtor_server

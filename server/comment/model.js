@@ -4,6 +4,7 @@ const httpStatus = require('http-status');
 const APIError = require('../helpers/APIError');
 const User = require('../user/model')
 const _ = require('lodash')
+const Likes = require('../like/model')
 
 /**
  * Comment Schema
@@ -22,6 +23,10 @@ const CommentSchema = new mongoose.Schema({
   news: {
     type: mongoose.Schema.ObjectId,
     ref: 'News',
+  },
+  newsAuthor: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
   },
   status: {
     type: Number,
@@ -119,20 +124,8 @@ CommentSchema.statics = {
           { replyTo: { $ne: null } },
         ]
         */
-  listByNewsId({ skip = 0, limit = 50, newsId } = {}) {
-    console.log('listByNewsId', newsId)
-    /*
-    return this.find({
-        status: 2,
-        news: newsId,
-      })
-      .populate('author')
-      .sort({ createdAt: -1 })
-      .skip(+skip)
-      .limit(+limit)
-      .exec()
-      */
-    return this.aggregate([
+  async listByNewsId({ skip = 0, limit = 50, newsId, user = {} } = {}) {
+    let list = await this.aggregate([
       {
         $match: {
           status: 2,
@@ -197,6 +190,27 @@ CommentSchema.statics = {
       { $sort: { createdAt: -1 } },
     ])
 
+    console.log('userId', user._id)
+    if (user._id) {
+      const likeList = await Likes.find({ author: user._id, refererType: 'comment' })
+      if (likeList.length > 0) {
+        _.forEach(list, cm => {
+          _.forEach(likeList, likes => {
+            if (cm._id.toString() === likes.referer.toString()) {
+              if (likes.type === 'like') {
+                cm.prized = true
+                cm.prizeId = likes._id
+              } else {
+                cm.disliked = true
+                cm.dislikeId = likes._id
+              }
+            }
+          })
+        })
+      }
+    }
+
+    return list
   }
 };
 

@@ -75,7 +75,7 @@ function listCommentsByNewsId(req, res, next) {
   const { pageSize = 20, page = 1 } = req.query;
   let limit = pageSize
   let skip = (page - 1) * pageSize
-  Comment.listByNewsId({ limit, skip, newsId })
+  Comment.listByNewsId({ limit, skip, newsId, user: req.session.user })
     .then(newss => res.json(newss))
     .catch(e => next(e));
 }

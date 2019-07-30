@@ -13,7 +13,7 @@ router.route('/')
   //.post(validate(paramValidation.createcomment), commentCtrl.create);
   .post(commentCtrl.create);
 
-router.route('/listCommentsByNewsId/:newsId')
+router.route('/listCommentsByNewsId')
   .get(commentCtrl.listCommentsByNewsId)
 
 router.route('/:_id')

@@ -115,10 +115,12 @@ function remove(req, res, next) {
 
   if (refererType === 'comment') {
     let incOpt = { likeCount: -1 }
+    let filter = { _id: referer, likeCount: { $gt: 0 } }
     if (type === 'dislike') {
       incOpt = { dislikeCount: -1 }
+      filter = { _id: referer, dislikeCount: { $gt: 0 } }
     }
-    Comment.updateOne({ _id: referer, likeCount: { $gt: 0 } }, { $inc: incOpt })
+    Comment.updateOne(filter, { $inc: incOpt })
       .then(rs => {
         console.log('updateOne rs', rs)
       }, err => {

@@ -1,4 +1,8 @@
 const User = require('./model');
+const News = require('../news/model')
+const Comment = require('../comment/model')
+const Reply = require('../reply/model')
+const Friend = require('../friend/model')
 
 /**
  * Load user and append to req.
@@ -91,4 +95,44 @@ function remove(req, res, next) {
     .catch(e => next(e));
 }
 
-module.exports = { load, get, create, update, list, remove, resetpwd };
+async function profile (req, res, next) {
+  let userId = req.params.userId || req.query.userId
+  if (!userId) {
+    res.status(500).json({ rs: 0 })
+  }
+  const { user = {} } = req.session
+  console.log('user', user._id)
+  let userInfo = await User.findOne({ _id: userId }).then(info => info)
+
+  let profile = await Promise.all([
+    News.find({ author: userId, type: 'news' }).countDocuments(),
+    News.find({ author: userId, type: 'remark' }).countDocuments(),
+    Comment.find({ newsAuthor: userId }).countDocuments(),
+    Reply.find({ commentAuthor: userId }).countDocuments(),
+    Friend.find({ referer: userId}).countDocuments(),
+    Friend.findOne({ referer: { $all: [userId, user._id] } })
+  ]).then(([newsCount, remarkCount, commentCount, replyCount, friendCount, friends]) => {
+    return { newsCount, remarkCount, commentCount, replyCount, friendCount, friends }
+  })
+
+  userInfo._doc.newsCount = profile.newsCount
+  userInfo._doc.remarkCount = profile.remarkCount
+  userInfo._doc.commentCount = profile.commentCount
+  userInfo._doc.replyCount = profile.replyCount
+  userInfo._doc.friendCount = profile.friendCount
+  userInfo._doc.friends = profile.friends
+  delete userInfo._doc.password
+
+  res.json(userInfo)
+}
+
+module.exports = {
+  load,
+  get,
+  create,
+  update,
+  list,
+  remove,
+  resetpwd,
+  profile,
+};

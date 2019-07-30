@@ -6,48 +6,17 @@ const User = require('../user/model')
 const _ = require('lodash')
 
 /**
- * Reply Schema
+ * Friend Schema
  * status: 0:delet, 1:draft, 2:publish
  */
-const ReplySchema = new mongoose.Schema({
+const FriendSchema = new mongoose.Schema({
 
-  content: {
-    type: String,
-    required: true,
-  },
-  type: {
-    type: String,
-    require: true,
-  },
-  comment: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'Comment',
-  },
-  commentAuthor: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'User',
-  },
-  status: {
-    type: Number,
-    default: 1,
-  },
-  attachment: {
-    type: Array,
-  },
-  author: {
-    type: mongoose.Schema.ObjectId,
+  referer: {
+    type: [mongoose.Schema.ObjectId],
     ref: 'User',
     required: true,
   },
-  authorInfo: {
-    type: Object,
-  },
-  likeCount: {
-    type: Number,
-  },
-  commentCount: {
-    type: Number,
-  },
+
   createdAt: {
     type: Date,
     default: Date.now
@@ -55,10 +24,6 @@ const ReplySchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now
-  },
-  replyTo: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'User',
   },
 });
 
@@ -72,21 +37,21 @@ const ReplySchema = new mongoose.Schema({
 /**
  * Methods
  */
-ReplySchema.method({
+FriendSchema.method({
 });
 
 /**
  * Statics
  */
-ReplySchema.statics = {
+FriendSchema.statics = {
   /**
    * Get user
    * @param {ObjectId} id - The objectId of user.
-   * @returns {Promise<Reply, APIError>}
+   * @returns {Promise<Friend, APIError>}
    */
   get(id) {
-    return this.findById(id)
-      .populate('author')
+    return this.find({referer: id})
+      .populate('referer')
       .exec()
       .then((user) => {
         if (user) {
@@ -101,7 +66,7 @@ ReplySchema.statics = {
    * List users in descending order of 'createdAt' timestamp.
    * @param {number} skip - Number of users to be skipped.
    * @param {number} limit - Limit number of users to be returned.
-   * @returns {Promise<Reply[]>}
+   * @returns {Promise<Friend[]>}
    */
   list({ skip = 0, limit = 50 } = {}) {
     return this.find({ status: 2 })
@@ -125,6 +90,6 @@ ReplySchema.statics = {
 };
 
 /**
- * @typedef Reply
+ * @typedef Friend
  */
-module.exports = mongoose.model('Reply', ReplySchema);
+module.exports = mongoose.model('Friend', FriendSchema);

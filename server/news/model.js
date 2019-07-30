@@ -130,21 +130,21 @@ NewsSchema.statics = {
     ])
     console.log('userId', user._id)
 
-    let prizeList = await Like.find({
-      author: user._id
-    })
-    console.log('prizeList', prizeList)
-    if (prizeList.length > 0) {
-      _.forEach(newsList, news => {
-        _.forEach(prizeList, p => {
-          console.log('prized', p.referer.toString(), news._id.toString(), news._id.valueOf() ,p.referer.valueOf())
-          if (news._id.toString() === p.referer.toString()) {
-            console.log('ok')
-            news.prized = true
-            news.prizeId = p._id
-          }
+    if (user._id) {
+      let prizeList = await Like.find({ author: user._id, refererType: 'news' })
+      console.log('prizeList', prizeList)
+      if (prizeList.length > 0) {
+        _.forEach(newsList, news => {
+          _.forEach(prizeList, p => {
+            console.log('prized', p.referer.toString(), news._id.toString(), news._id.valueOf() ,p.referer.valueOf())
+            if (news._id.toString() === p.referer.toString()) {
+              console.log('ok')
+              news.prized = true
+              news.prizeId = p._id
+            }
+          })
         })
-      })
+      }
     }
 
     return newsList

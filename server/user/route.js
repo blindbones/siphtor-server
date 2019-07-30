@@ -12,6 +12,9 @@ router.route('/')
   /** POST /api/users - Create new user */
   .post(validate(paramValidation.createUser), userCtrl.create);
 
+router.route('/profile/:userId')
+  .get(userCtrl.profile)
+
 router.route('/resetpwd')
   .patch(userCtrl.resetpwd)
 
